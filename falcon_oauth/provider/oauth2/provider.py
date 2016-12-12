@@ -4,6 +4,7 @@ import logging
 from functools import wraps
 
 import falcon
+from base64 import b64encode
 
 from oauthlib import oauth2
 from oauthlib.oauth2 import Server
@@ -355,6 +356,9 @@ class OAuthProvider(object):
                     return jsonify(status='error')
         """
         uri, http_method, body, headers = extract_params(req)
+        # base 64 the body because oauth assumes that the body cannot be binary.
+        if isinstance(body, bytes):
+            body = b64encode(body)
         return self.server.verify_request(
             uri, http_method, body, headers, scopes
         )
